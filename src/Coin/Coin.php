@@ -1,7 +1,7 @@
 <?php
-namespace VendingMachine\Coins;
+namespace VendingMachine\Coin;
 
-use VendingMachine\Coins\Contracts\CoinInterface;
+use VendingMachine\Coin\Contracts\CoinInterface;
 
 class Coin implements CoinInterface
 {

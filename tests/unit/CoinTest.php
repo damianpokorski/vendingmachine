@@ -3,7 +3,7 @@
 namespace VendingMachine\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
-use VendingMachine\Coins\Coin;
+use VendingMachine\Coin\Coin;
 
 class CoinTest extends TestCase
 {

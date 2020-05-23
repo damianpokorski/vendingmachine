@@ -1,6 +1,6 @@
 <?php
 
-namespace VendingMachine\Coins\Contracts;
+namespace VendingMachine\Coin\Contracts;
 
 interface CoinInterface
 {

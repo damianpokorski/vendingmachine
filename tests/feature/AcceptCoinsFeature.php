@@ -3,14 +3,22 @@
 namespace VendingMachine\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
-use VendingMachine\Coins\Coin;
-use VendingMachine\VendingMachine;
+use VendingMachine\Coin\Coin;
+use VendingMachine\SimpleVendingMachine;
 
-class VendingMachineAcceptCoinsFeature extends TestCase
+class VendingMachineAcceptCoinFeature extends TestCase
 {
-    public function testAcceptCoinFeature()
+    public function testAcceptCoinFeatureExists()
     {
-        $vendingMachine = new VendingMachine();
-        $this->assertFalse($vendingMachine->acceptCoin(new Coin()));
+        $vendingMachine = new SimpleVendingMachine;
+        $this->assertTrue(method_exists($vendingMachine, 'insertCoin'));
+    }
+
+    public function testRejectInvalidCoin()
+    {
+        $vendingMachine = new SimpleVendingMachine;
+        $vendingMachine->insertCoin(new Coin(-1, -1));
+        
+        
     }
 }
