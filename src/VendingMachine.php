@@ -5,6 +5,7 @@ namespace VendingMachine;
 use Exception;
 use VendingMachine\Coin\Contracts\CoinInterface;
 use VendingMachine\Coin\Contracts\CoinRepositoryInterface;
+use VendingMachine\Display\DisplayInterface;
 
 class VendingMachine
 {
@@ -12,28 +13,40 @@ class VendingMachine
      *
      * @var CoinRepositoryInterface
      */
-    private $bank;
+    protected $bank;
 
     /**
      *
      * @var CoinRepositoryInterface
      */
-    private $pendingTransactionTray;
+    protected $pendingTransactionTray;
 
     /**
      *
      * @var CoinRepositoryInterface
      */
-    private $returnTray;
+    protected $returnTray;
 
-    public function __construct(CoinRepositoryInterface $bank, CoinRepositoryInterface $pendingTransactionTray, CoinRepositoryInterface $returnTray)
-    {
+    /**
+     *
+     * @var DisplayInterface
+     */
+    protected $display;
+
+    public function __construct(
+        CoinRepositoryInterface $bank,
+        CoinRepositoryInterface $pendingTransactionTray,
+        CoinRepositoryInterface $returnTray,
+        DisplayInterface $display
+    ) {
         $this->bank = $bank;
         $this->pendingTransactionTray = $pendingTransactionTray;
         $this->returnTray = $returnTray;
+        $this->display = $display;
     }
 
-    public function insertCoin(CoinInterface $coin) {
+    public function insertCoin(CoinInterface $coin)
+    {
         throw new Exception("Unimplemented feature");
     }
 }

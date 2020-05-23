@@ -3,6 +3,7 @@
 namespace VendingMachine;
 
 use VendingMachine\Coin\MemoryCoinRepository;
+use VendingMachine\Display\MemoryDisplay;
 use VendingMachine\VendingMachine;
 
 class SimpleVendingMachine extends VendingMachine
@@ -12,7 +13,8 @@ class SimpleVendingMachine extends VendingMachine
         parent::__construct(
             new MemoryCoinRepository,
             new MemoryCoinRepository,
-            new MemoryCoinRepository
+            new MemoryCoinRepository,
+            new MemoryDisplay
         );
     }
 }

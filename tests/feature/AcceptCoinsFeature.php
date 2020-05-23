@@ -18,7 +18,5 @@ class VendingMachineAcceptCoinFeature extends TestCase
     {
         $vendingMachine = new SimpleVendingMachine;
         $vendingMachine->insertCoin(new Coin(-1, -1));
-        
-        
     }
 }
