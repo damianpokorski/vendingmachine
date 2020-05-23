@@ -2,7 +2,7 @@
 
 namespace VendingMachine\Display;
 
-use VendingMachine\Display\DisplayInterface;
+use VendingMachine\Display\Contracts\DisplayInterface;
 
 class MemoryDisplay implements DisplayInterface
 {

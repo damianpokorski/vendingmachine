@@ -1,9 +1,9 @@
 <?php
 
-namespace VendingMachine\Coin;
+namespace VendingMachine\CoinRepository;
 
 use VendingMachine\Coin\Contracts\CoinInterface;
-use VendingMachine\Coin\Contracts\CoinRepositoryInterface;
+use VendingMachine\CoinRepository\Contracts\CoinRepositoryInterface;
 
 class MemoryCoinRepository implements CoinRepositoryInterface
 {

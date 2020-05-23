@@ -5,8 +5,9 @@ use VendingMachine\Coin\Contracts\CoinInterface;
 
 class Coin implements CoinInterface
 {
-    private $diameter;
-    private $weight;
+    protected $diameter;
+    protected $weight;
+    
     public function __construct(float $diamater = 0, float $weight = 0)
     {
         $this->diameter = $diamater;

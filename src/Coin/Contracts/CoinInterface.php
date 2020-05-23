@@ -4,6 +4,17 @@ namespace VendingMachine\Coin\Contracts;
 
 interface CoinInterface
 {
-    public function getDiameter(): float;
-    public function getWeight(): float;
+    /**
+     * Diameter definition in millimiters
+     *
+     * @return float
+     */
+    public function getDiameter();
+
+    /**
+     * Weight definition in grams
+     *
+     * @return float
+     */
+    public function getWeight();
 }

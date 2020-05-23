@@ -4,7 +4,7 @@ namespace VendingMachine\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
 use VendingMachine\Coin\Coin;
-use VendingMachine\Coin\MemoryCoinRepository;
+use VendingMachine\CoinRepository\MemoryCoinRepository;
 
 class MemoryCoinRepositoryTest extends TestCase
 {

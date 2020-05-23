@@ -1,6 +1,6 @@
 <?php
 
-namespace VendingMachine\Display;
+namespace VendingMachine\Display\Contracts;
 
 interface DisplayInterface
 {

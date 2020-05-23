@@ -3,9 +3,10 @@
 namespace VendingMachine;
 
 use Exception;
+use VendingMachine\Coin\Contracts\CoinEvaluatorInterface;
 use VendingMachine\Coin\Contracts\CoinInterface;
-use VendingMachine\Coin\Contracts\CoinRepositoryInterface;
-use VendingMachine\Display\DisplayInterface;
+use VendingMachine\CoinRepository\Contracts\CoinRepositoryInterface;
+use VendingMachine\Display\Contracts\DisplayInterface;
 
 class VendingMachine
 {
@@ -33,20 +34,64 @@ class VendingMachine
      */
     protected $display;
 
+    /**
+     * Undocumented variable
+     *
+     * @var CoinEvaluatorInterface[]
+     */
+    protected $coinEvaluators;
+
+    /**
+     *
+     * @param CoinRepositoryInterface $bank
+     * @param CoinRepositoryInterface $pendingTransactionTray
+     * @param CoinRepositoryInterface $returnTray
+     * @param DisplayInterface $display
+     * @param CoinEvaluatorInterface[] $coinEvaluators
+     * @return void
+     */
     public function __construct(
-        CoinRepositoryInterface $bank,
-        CoinRepositoryInterface $pendingTransactionTray,
-        CoinRepositoryInterface $returnTray,
-        DisplayInterface $display
+        $bank,
+        $pendingTransactionTray,
+        $returnTray,
+        $display,
+        $coinEvaluators = []
     ) {
         $this->bank = $bank;
         $this->pendingTransactionTray = $pendingTransactionTray;
         $this->returnTray = $returnTray;
         $this->display = $display;
+        $this->coinEvaluators = $coinEvaluators;
+
+        // If
+        if (empty($this->pendingTransactionTray->contents())) {
+            $this->display->setContent("INSERT COIN");
+        }
+    }
+
+    /**
+     * Iterates through the coin definition and returns first valid value
+     * If no value is found - returns null
+     *
+     * @param CoinInterface $coin
+     * @return float|null
+     */
+    private function getCoinValue($coin)
+    {
+        foreach ($this->coinEvaluators as $evaluator) {
+            $value = $evaluator->getCoinValue($coin);
+            if (!is_null($value)) {
+                return $value;
+            }
+        }
+        return null;
     }
 
     public function insertCoin(CoinInterface $coin)
     {
-        throw new Exception("Unimplemented feature");
+        $coinValue = $this->getCoinValue($coin);
+        if (\is_null($coinValue)) {
+            $this->returnTray->add($coin);
+        }
     }
 }
