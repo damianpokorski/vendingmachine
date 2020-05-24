@@ -79,9 +79,8 @@ class VendingMachine
     private function getCoinValue(CoinInterface $coin)
     {
         foreach ($this->coinEvaluators as $evaluator) {
-            $value = $evaluator->getCoinValue($coin);
-            if (!is_null($value)) {
-                return $value;
+            if ($evaluator->is($coin)) {
+                return $evaluator->getCoinValue($coin);
             }
         }
         return null;

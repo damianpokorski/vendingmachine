@@ -7,12 +7,13 @@ use VendingMachine\Coin\Contracts\CoinEvaluatorInterface;
 
 class NickelCoinEvaluator implements CoinEvaluatorInterface
 {
+    public function is(\VendingMachine\Coin\Contracts\CoinInterface $coin): bool
+    {
+        return $coin->getDiameter() == NickelCoin::$diameter && $coin->getWeight() == NickelCoin::$weight;
+    }
+    
     public function getCoinValue(CoinInterface $coin): ?float
     {
-        if ($coin->getDiameter() == NickelCoin::$diameter && $coin->getWeight() == NickelCoin::$weight) {
-            return 0.05;
-        }
-
-        return null;
+        return static::is($coin) ? 0.05 : null;
     }
 }

@@ -7,12 +7,13 @@ use VendingMachine\Coin\Contracts\CoinEvaluatorInterface;
 
 class QuarterCoinEvaluator implements CoinEvaluatorInterface
 {
+    public function is(\VendingMachine\Coin\Contracts\CoinInterface $coin): bool
+    {
+        return $coin->getDiameter() == QuarterCoin::$diameter && $coin->getWeight() == QuarterCoin::$weight;
+    }
+
     public function getCoinValue(CoinInterface $coin): ?float
     {
-        if ($coin->getDiameter() == QuarterCoin::$diameter && $coin->getWeight() == QuarterCoin::$weight) {
-            return 0.25;
-        }
-
-        return null;
+        return static::is($coin) ? 0.25 : null;
     }
 }

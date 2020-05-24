@@ -4,6 +4,7 @@ namespace VendingMachine\Coin\Contracts;
 
 interface CoinEvaluatorInterface
 {
+    public function is(CoinInterface $coin): bool;
     /**
      * Returns the value of a coin or a null if the value is not correct
      *
