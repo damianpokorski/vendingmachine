@@ -23,7 +23,7 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
      * @param CoinEvaluatorInterface[] $coinEvaluators
      * @param StockInterface[] $coinEvaluators
      */
-    public function testDisposeProductWithExactChange(
+    public function testDisposeProductWithExactChangeShowsThankYouMessage(
         $vendingMachine,
         $bank,
         $pendingTransactionTray,
@@ -41,7 +41,8 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
 
         // Select product
         $vendingMachine->selectProduct(new CokeProduct);
-        // Assert the displayed value is still insert coin as we have yet to insert a valid coin
+
+        // Assest successful message after purchase
         $this->assertEquals('THANK YOU', $display->getContent());
     }
 
@@ -55,7 +56,7 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
      * @param CoinEvaluatorInterface[] $coinEvaluators
      * @param StockInterface[] $coinEvaluators
      */
-    public function testDisposalWithoutAnyFundsShowsItemPrice(
+    public function testDisposeProductWithExactChangeShowsThankYouMessageFollowedByInsertCoinAndEmptyingPendingTransactionTray(
         $vendingMachine,
         $bank,
         $pendingTransactionTray,
@@ -64,12 +65,24 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
         $coinEvaluators,
         $stock
     ) {
+        // Insert exact change for a coke
+        $vendingMachine->insertCoin(new QuarterCoin);
+        $vendingMachine->insertCoin(new QuarterCoin);
+        $vendingMachine->insertCoin(new QuarterCoin);
+        $vendingMachine->insertCoin(new QuarterCoin);
+        
 
         // Select product
         $vendingMachine->selectProduct(new CokeProduct);
 
+        // Assest successful message after purchase
+        $this->assertEquals('THANK YOU', $display->getContent());
+
+        // Assest successful message after purchase
+        $this->assertEquals('INSERT COIN', $display->getContent());
+
         // Assert the displayed value is still insert coin as we have yet to insert a valid coin
-        $this->assertEquals('PRICE 1.00', $display->getContent());
+        $this->assertEmpty($pendingTransactionTray->contents());
     }
 
     /**

@@ -115,14 +115,16 @@ class VendingMachine
 
                 // No funds available - display price
                 if ($availableFunds == 0) {
-                    $this->display->setContent('PRICE '.\money_format('%i', $stock->getProduct()->getPrice()));
+                    $this->display->setContent('INSERT COIN');
+                    $this->display->setContent('PRICE '.\money_format('%i', $stock->getProduct()->getPrice()), true);
                     return;
                 }
                 
                 // Product can be disposed safely
                 if ($product->getPrice() <=$availableFunds) {
                     $stock->dispose();
-                    $this->display->setContent('THANK YOU');
+                    $this->display->setContent('INSERT COIN');
+                    $this->display->setContent('THANK YOU', true);
                     return;
                 }
             }

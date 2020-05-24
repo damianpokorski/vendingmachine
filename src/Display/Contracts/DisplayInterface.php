@@ -10,7 +10,7 @@ interface DisplayInterface
      * @param string $content
      * @return void
      */
-    public function setContent(string $content);
+    public function setContent(string $content, $temporary = false);
 
     /**
      * Gets the currently displayed value
