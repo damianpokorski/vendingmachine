@@ -76,7 +76,7 @@ class VendingMachine
      * @param CoinInterface $coin
      * @return float|null
      */
-    private function getCoinValue($coin)
+    private function getCoinValue(CoinInterface $coin)
     {
         foreach ($this->coinEvaluators as $evaluator) {
             $value = $evaluator->getCoinValue($coin);
@@ -87,11 +87,20 @@ class VendingMachine
         return null;
     }
 
+    /**
+     * Handles the coin insertion logic
+     *
+     * @param CoinInterface $coin
+     * @return void
+     */
     public function insertCoin(CoinInterface $coin)
     {
         $coinValue = $this->getCoinValue($coin);
+
+        // Coins without value are placed back in return tray
         if (\is_null($coinValue)) {
             $this->returnTray->add($coin);
+            return;
         }
     }
 }

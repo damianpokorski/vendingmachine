@@ -2,36 +2,66 @@
 
 namespace VendingMachine\Tests\Feature;
 
-use PHPUnit\Framework\TestCase;
 use VendingMachine\Coin\Coin;
+use PHPUnit\Framework\TestCase;
+use VendingMachine\VendingMachine;
+use VendingMachine\SimpleVendingMachine;
+use VendingMachine\Display\MemoryDisplay;
 use VendingMachine\Coin\Definition\NickelCoin;
 use VendingMachine\Coin\Evaluator\CommonEvaluators;
+use VendingMachine\Display\Contracts\DisplayInterface;
 use VendingMachine\CoinRepository\MemoryCoinRepository;
-use VendingMachine\Display\MemoryDisplay;
-use VendingMachine\SimpleVendingMachine;
-use VendingMachine\VendingMachine;
+use VendingMachine\CoinRepository\Contracts\CoinRepositoryInterface;
 
 class VendingMachineAcceptCoinFeature extends TestCase
 {
+    public function vendingMachineDataProvider()
+    {
+        $bank = new MemoryCoinRepository;
+        $pendingTransactionTray = new MemoryCoinRepository;
+        $returnTray = new MemoryCoinRepository;
+        $display = new MemoryDisplay;
+        $evaluators = CommonEvaluators::americanExceptPennies();
+
+        yield [
+            new VendingMachine(
+                $bank,
+                $pendingTransactionTray,
+                $returnTray,
+                $display,
+                $evaluators
+            ),
+            $bank,
+            $pendingTransactionTray,
+            $returnTray,
+            $display,
+            $evaluators
+        ];
+    }
+
     public function testAcceptCoinFeatureExists()
     {
         $vendingMachine = new SimpleVendingMachine;
         $this->assertTrue(method_exists($vendingMachine, 'insertCoin'));
     }
 
-    public function testRejectInvalidCoin()
-    {
-        $returnTray = new MemoryCoinRepository;
-        $display = new MemoryDisplay;
-
-        $vendingMachine = new VendingMachine(
-            new MemoryCoinRepository,
-            new MemoryCoinRepository,
-            $returnTray,
-            $display,
-            CommonEvaluators::american()
-        );
-        
+    /**
+     * @dataProvider vendingMachineDataProvider
+     * @param VendingMachine $vendingMachine
+     * @param CoinRepositoryInterface $bank
+     * @param CoinRepositoryInterface $pendingTransactionTray
+     * @param CoinRepositoryInterface $returnTray
+     * @param DisplayInterface $display
+     * @param CoinEvaluatorInterface[] $coinEvaluators
+     */
+    public function testRejectInvalidCoin(
+        $vendingMachine,
+        $bank,
+        $pendingTransactionTray,
+        $returnTray,
+        $display,
+        $coinEvaluators
+    ) {
         // Assert the displayed value before coin insertion
         $this->assertEquals('INSERT COIN', $display->getContent());
 
@@ -44,32 +74,33 @@ class VendingMachineAcceptCoinFeature extends TestCase
         $this->assertEquals($returnTray->contents()[0]->getDiameter(), -1);
         $this->assertEquals($returnTray->contents()[0]->getWeight(), -1);
 
-
         // Assert the displayed value is still insert coin as we have yet to insert a valid coin
         $this->assertEquals('INSERT COIN', $display->getContent());
     }
 
-    public function testAcceptValidCoin()
-    {
-
-        $pendingCoins = new MemoryCoinRepository;
-        $display = new MemoryDisplay;
-
-        $vendingMachine = new VendingMachine(
-            new MemoryCoinRepository,
-            $pendingCoins,
-            new MemoryDisplay,
-            $display,
-            CommonEvaluators::american()
-        );
-
+    /**
+     * @dataProvider vendingMachineDataProvider
+     * @param VendingMachine $vendingMachine
+     * @param CoinRepositoryInterface $bank
+     * @param CoinRepositoryInterface $pendingTransactionTray
+     * @param CoinRepositoryInterface $returnTray
+     * @param DisplayInterface $display
+     * @param CoinEvaluatorInterface[] $coinEvaluators
+     */
+    public function testAcceptValidCoin(
+        $vendingMachine,
+        $bank,
+        $pendingTransactionTray,
+        $returnTray,
+        $display,
+        $coinEvaluators
+    ) {
         // Assert the displayed value before coin insertion
         $this->assertEquals('INSERT COIN', $display->getContent());
-
 
         // Assert the displayed value before coin insertion
         $vendingMachine->insertCoin(new NickelCoin);
 
-        $this->assertCount(1, $pendingCoins->contents());
+        $this->assertCount(1, $pendingTransactionTray->contents());
     }
 }

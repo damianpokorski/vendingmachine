@@ -13,7 +13,7 @@ class CommonEvaluators
      *
      * @return CoinEvaluatorInterface[]
      */
-    public static function american()
+    public static function americanExceptPennies()
     {
         return [
             new DimeCoinEvaluator,
