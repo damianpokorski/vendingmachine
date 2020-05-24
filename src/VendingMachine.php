@@ -5,6 +5,7 @@ namespace VendingMachine;
 use Exception;
 use VendingMachine\Coin\Contracts\CoinEvaluatorInterface;
 use VendingMachine\Coin\Contracts\CoinInterface;
+use VendingMachine\CoinRepository\CoinRepositoryAggregateExtensions;
 use VendingMachine\CoinRepository\Contracts\CoinRepositoryInterface;
 use VendingMachine\Display\Contracts\DisplayInterface;
 
@@ -86,6 +87,12 @@ class VendingMachine
         return null;
     }
 
+    private function displayPendingTransactionTotal()
+    {
+        $totalValue = CoinRepositoryAggregateExtensions::totalValue($this->pendingTransactionTray, $this->coinEvaluators);
+        $this->display->setContent(\money_format('%i', $totalValue));
+    }
+
     /**
      * Handles the coin insertion logic
      *
@@ -103,5 +110,6 @@ class VendingMachine
         }
 
         $this->pendingTransactionTray->add($coin);
+        $this->displayPendingTransactionTotal();
     }
 }
