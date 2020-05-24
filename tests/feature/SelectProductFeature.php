@@ -21,7 +21,7 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
      * @param CoinRepositoryInterface $returnTray
      * @param DisplayInterface $display
      * @param CoinEvaluatorInterface[] $coinEvaluators
-     * @param StockInterface[] $coinEvaluators
+     * @param StockInterface[] $stock
      */
     public function testDisposeProductWithExactChangeShowsThankYouMessage(
         $vendingMachine,
@@ -54,7 +54,7 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
      * @param CoinRepositoryInterface $returnTray
      * @param DisplayInterface $display
      * @param CoinEvaluatorInterface[] $coinEvaluators
-     * @param StockInterface[] $coinEvaluators
+     * @param StockInterface[] $stock
      */
     public function testDisposeProductWithExactChangeShowsThankYouMessageFollowedByInsertCoinAndEmptyingPendingTransactionTray(
         $vendingMachine,
@@ -93,7 +93,7 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
      * @param CoinRepositoryInterface $returnTray
      * @param DisplayInterface $display
      * @param CoinEvaluatorInterface[] $coinEvaluators
-     * @param StockInterface[] $coinEvaluators
+     * @param StockInterface[] $stock
      */
     public function testDisposalWithoutAnyFundsShowsItemPriceThenInsertCoinMessage(
         $vendingMachine,
@@ -123,7 +123,7 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
      * @param CoinRepositoryInterface $returnTray
      * @param DisplayInterface $display
      * @param CoinEvaluatorInterface[] $coinEvaluators
-     * @param StockInterface[] $coinEvaluators
+     * @param StockInterface[] $stock
      */
     public function testDisposalWithInsufficientFundsShowsItemPriceThenInsertCoinMessage(
         $vendingMachine,
