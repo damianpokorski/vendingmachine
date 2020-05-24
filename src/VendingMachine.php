@@ -101,5 +101,7 @@ class VendingMachine
             $this->returnTray->add($coin);
             return;
         }
+
+        $this->pendingTransactionTray->add($coin);
     }
 }

@@ -11,7 +11,10 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "VendingMachine\\": "src"
+            "VendingMachine\\": "src",
+            "VendingMachine\\Tests\\": "tests",
+            "VendingMachine\\Tests\\Feature\\": "tests/feature",
+            "VendingMachine\\Tests\\Unit\\": "tests/unit"
         }
     },
     "authors": [

@@ -3,42 +3,16 @@
 namespace VendingMachine\Tests\Feature;
 
 use VendingMachine\Coin\Coin;
-use PHPUnit\Framework\TestCase;
 use VendingMachine\VendingMachine;
 use VendingMachine\SimpleVendingMachine;
-use VendingMachine\Display\MemoryDisplay;
 use VendingMachine\Coin\Definition\NickelCoin;
-use VendingMachine\Coin\Evaluator\CommonEvaluators;
 use VendingMachine\Display\Contracts\DisplayInterface;
-use VendingMachine\CoinRepository\MemoryCoinRepository;
+use VendingMachine\Tests\BaseVendingMachineFeatureTest;
+use VendingMachine\CoinRepository\CoinRepositoryAggregateExtensions;
 use VendingMachine\CoinRepository\Contracts\CoinRepositoryInterface;
 
-class VendingMachineAcceptCoinFeature extends TestCase
+class VendingMachineAcceptCoinFeature extends BaseVendingMachineFeatureTest
 {
-    public function vendingMachineDataProvider()
-    {
-        $bank = new MemoryCoinRepository;
-        $pendingTransactionTray = new MemoryCoinRepository;
-        $returnTray = new MemoryCoinRepository;
-        $display = new MemoryDisplay;
-        $evaluators = CommonEvaluators::americanExceptPennies();
-
-        yield [
-            new VendingMachine(
-                $bank,
-                $pendingTransactionTray,
-                $returnTray,
-                $display,
-                $evaluators
-            ),
-            $bank,
-            $pendingTransactionTray,
-            $returnTray,
-            $display,
-            $evaluators
-        ];
-    }
-
     public function testAcceptCoinFeatureExists()
     {
         $vendingMachine = new SimpleVendingMachine;
@@ -102,5 +76,8 @@ class VendingMachineAcceptCoinFeature extends TestCase
         $vendingMachine->insertCoin(new NickelCoin);
 
         $this->assertCount(1, $pendingTransactionTray->contents());
+
+        // Assert that the pending transaction tray value is 0.05
+        $this->assertEquals(0.05, CoinRepositoryAggregateExtensions::totalValue($pendingTransactionTray, $coinEvaluators));
     }
 }
