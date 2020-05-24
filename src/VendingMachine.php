@@ -200,4 +200,13 @@ class VendingMachine
             }
         }
     }
+
+    public function returnCoins()
+    {
+        foreach ($this->pendingTransactionTray->contents() as $coin) {
+            $this->pendingTransactionTray->remove($coin);
+            $this->returnTray->add($coin);
+        }
+        $this->display->setContent('INSERT COIN');
+    }
 }
