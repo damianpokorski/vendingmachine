@@ -114,4 +114,36 @@ class SelectProductFeature extends BaseVendingMachineFeatureTest
         // Subsequent checks display INSERT COIN
         $this->assertEquals('INSERT COIN', $display->getContent());
     }
+
+    /**
+     * @dataProvider vendingMachineDataProvider
+     * @param VendingMachine $vendingMachine
+     * @param CoinRepositoryInterface $bank
+     * @param CoinRepositoryInterface $pendingTransactionTray
+     * @param CoinRepositoryInterface $returnTray
+     * @param DisplayInterface $display
+     * @param CoinEvaluatorInterface[] $coinEvaluators
+     * @param StockInterface[] $coinEvaluators
+     */
+    public function testDisposalWithInsufficientFundsShowsItemPriceThenInsertCoinMessage(
+        $vendingMachine,
+        $bank,
+        $pendingTransactionTray,
+        $returnTray,
+        $display,
+        $coinEvaluators,
+        $stock
+    ) {
+        // Insert only 25c
+        $vendingMachine->insertCoin(new QuarterCoin);
+
+        // Select product
+        $vendingMachine->selectProduct(new CokeProduct);
+
+        // Assert the displayed value is still insert coin as we have yet to insert a valid coin
+        $this->assertEquals('PRICE 1.00', $display->getContent());
+
+        // Subsequent checks display INSERT COIN
+        $this->assertEquals('INSERT COIN', $display->getContent());
+    }
 }

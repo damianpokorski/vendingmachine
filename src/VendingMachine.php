@@ -114,7 +114,7 @@ class VendingMachine
                 $availableFunds = CoinRepositoryAggregateExtensions::totalValue($this->pendingTransactionTray, $this->coinEvaluators);
 
                 // No funds available - display price
-                if ($availableFunds == 0) {
+                if ($availableFunds < $product->getPrice()) {
                     $this->display->setContent('INSERT COIN');
                     $this->display->setContent('PRICE '.\money_format('%i', $stock->getProduct()->getPrice()), true);
                     return;
@@ -122,7 +122,16 @@ class VendingMachine
                 
                 // Product can be disposed safely
                 if ($product->getPrice() <=$availableFunds) {
+                    // Move the coins from pending tray to the bank
+                    foreach ($this->pendingTransactionTray->contents() as $coin) {
+                        $this->pendingTransactionTray->remove($coin);
+                        $this->bank->add($coin);
+                    }
+
+                    // Dispose items
                     $stock->dispose();
+
+                    // Update display
                     $this->display->setContent('INSERT COIN');
                     $this->display->setContent('THANK YOU', true);
                     return;
