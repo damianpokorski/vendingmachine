@@ -3,11 +3,14 @@
 namespace VendingMachine;
 
 use Exception;
-use VendingMachine\Coin\Contracts\CoinEvaluatorInterface;
+use VendingMachine\Coin\CoinExtensions;
 use VendingMachine\Coin\Contracts\CoinInterface;
+use VendingMachine\Stock\Contracts\StockInterface;
+use VendingMachine\Display\Contracts\DisplayInterface;
+use VendingMachine\Coin\Contracts\CoinEvaluatorInterface;
 use VendingMachine\CoinRepository\CoinRepositoryAggregateExtensions;
 use VendingMachine\CoinRepository\Contracts\CoinRepositoryInterface;
-use VendingMachine\Display\Contracts\DisplayInterface;
+use VendingMachine\Stock\Contracts\ProductInterface;
 
 class VendingMachine
 {
@@ -36,11 +39,16 @@ class VendingMachine
     protected $display;
 
     /**
-     * Undocumented variable
      *
      * @var CoinEvaluatorInterface[]
      */
     protected $coinEvaluators;
+
+    /**
+     *
+     * @var StockInterface[]
+     */
+    protected $stock;
 
     /**
      *
@@ -49,6 +57,7 @@ class VendingMachine
      * @param CoinRepositoryInterface $returnTray
      * @param DisplayInterface $display
      * @param CoinEvaluatorInterface[] $coinEvaluators
+     * @param StockInterface[] $stock
      * @return void
      */
     public function __construct(
@@ -56,35 +65,20 @@ class VendingMachine
         $pendingTransactionTray,
         $returnTray,
         $display,
-        $coinEvaluators = []
+        $coinEvaluators = [],
+        $stock = []
     ) {
         $this->bank = $bank;
         $this->pendingTransactionTray = $pendingTransactionTray;
         $this->returnTray = $returnTray;
         $this->display = $display;
         $this->coinEvaluators = $coinEvaluators;
+        $this->stock = $stock;
 
         // If
         if (empty($this->pendingTransactionTray->contents())) {
             $this->display->setContent("INSERT COIN");
         }
-    }
-
-    /**
-     * Iterates through the coin definition and returns first valid value
-     * If no value is found - returns null
-     *
-     * @param CoinInterface $coin
-     * @return float|null
-     */
-    private function getCoinValue(CoinInterface $coin)
-    {
-        foreach ($this->coinEvaluators as $evaluator) {
-            if ($evaluator->is($coin)) {
-                return $evaluator->getCoinValue($coin);
-            }
-        }
-        return null;
     }
 
     private function displayPendingTransactionTotal()
@@ -101,7 +95,7 @@ class VendingMachine
      */
     public function insertCoin(CoinInterface $coin)
     {
-        $coinValue = $this->getCoinValue($coin);
+        $coinValue = CoinExtensions::getCoinValue($coin, $this->coinEvaluators);
 
         // Coins without value are placed back in return tray
         if (\is_null($coinValue)) {
@@ -111,5 +105,27 @@ class VendingMachine
 
         $this->pendingTransactionTray->add($coin);
         $this->displayPendingTransactionTotal();
+    }
+
+    public function selectProduct(ProductInterface $product)
+    {
+        foreach ($this->stock as $stock) {
+            if ($stock->getProduct()->getName() == $product->getName()) {
+                $availableFunds = CoinRepositoryAggregateExtensions::totalValue($this->pendingTransactionTray, $this->coinEvaluators);
+
+                // No funds available - display price
+                if ($availableFunds == 0) {
+                    $this->display->setContent('PRICE '.\money_format('%i', $stock->getProduct()->getPrice()));
+                    return;
+                }
+                
+                // Product can be disposed safely
+                if ($product->getPrice() <=$availableFunds) {
+                    $stock->dispose();
+                    $this->display->setContent('THANK YOU');
+                    return;
+                }
+            }
+        }
     }
 }

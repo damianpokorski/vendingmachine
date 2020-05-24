@@ -7,6 +7,10 @@ use VendingMachine\VendingMachine;
 use VendingMachine\Display\MemoryDisplay;
 use VendingMachine\Coin\Evaluator\CommonEvaluators;
 use VendingMachine\CoinRepository\MemoryCoinRepository;
+use VendingMachine\Stock\Definition\CandyProduct;
+use VendingMachine\Stock\Definition\ChipsProduct;
+use VendingMachine\Stock\Definition\CokeProduct;
+use VendingMachine\Stock\MemoryStock;
 
 abstract class BaseVendingMachineFeatureTest extends TestCase
 {
@@ -17,6 +21,11 @@ abstract class BaseVendingMachineFeatureTest extends TestCase
         $returnTray = new MemoryCoinRepository;
         $display = new MemoryDisplay;
         $evaluators = CommonEvaluators::americanExceptPennies();
+        $stock = [
+            new MemoryStock(new CokeProduct, 10),
+            new MemoryStock(new ChipsProduct, 10),
+            new MemoryStock(new CandyProduct, 10),
+        ];
 
         yield [
             new VendingMachine(
@@ -24,13 +33,15 @@ abstract class BaseVendingMachineFeatureTest extends TestCase
                 $pendingTransactionTray,
                 $returnTray,
                 $display,
-                $evaluators
+                $evaluators,
+                $stock
             ),
             $bank,
             $pendingTransactionTray,
             $returnTray,
             $display,
-            $evaluators
+            $evaluators,
+            $stock
         ];
     }
 }
