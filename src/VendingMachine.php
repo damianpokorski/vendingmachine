@@ -79,6 +79,9 @@ class VendingMachine
         if (empty($this->pendingTransactionTray->contents())) {
             $this->display->setContent("INSERT COIN");
         }
+
+        // Set arbitratry math precition to 3 digits after .
+        bcscale(3);
     }
 
     private function displayPendingTransactionTotal()
@@ -107,6 +110,52 @@ class VendingMachine
         $this->displayPendingTransactionTotal();
     }
 
+    public function pickChange($changeToDispose)
+    {
+        $evaluators = $this->coinEvaluators;
+
+        // Only look at the coins with value which is equal or less of the change to dispose
+        $availableCoins = array_filter($this->bank->contents(), function (CoinInterface $coin) use ($changeToDispose, $evaluators) {
+            return CoinExtensions::getCoinValue($coin, $evaluators) <= $changeToDispose;
+        });
+        
+        // Sort available coins by their value - desc
+        \usort($availableCoins, function (CoinInterface $a, CoinInterface $b) use ($evaluators) {
+            return CoinExtensions::getCoinValue($a, $evaluators) < CoinExtensions::getCoinValue($b, $evaluators) ? 1 : -1;
+        });
+
+        // Using bccomp function instead of >= as floating point comparisons cannot be trusted
+        // Same reason bcsub is used instead of -
+        // And bcadd instead of +
+
+        $change = [];
+        $changeValue = "0.0";
+        
+        // Iterate through the coins in the bank
+        foreach ($availableCoins as $coin) {
+            // Calculate remaining change to pay
+            $outstandingChange = $changeToDispose - $changeValue;
+            $coinValue = CoinExtensions::getCoinValue($coin, $evaluators);
+
+            // If coin can contribute to the change without going overpaying the customer - use it
+            if (bccomp($outstandingChange, $coinValue) == 1 || bccomp($outstandingChange, $coinValue) == 0) {
+                // Update change
+                $change[] = $coin;
+                $changeValue = bcadd($changeValue, $coinValue);
+
+                // Recaulculate outstanding change as it has been changed
+                $outstandingChange = bcsub($changeToDispose, $changeValue);
+            }
+
+            // No more outstanding change to process
+            if (bccomp($outstandingChange, 0) == 0) {
+                return $change;
+            }
+        }
+
+        return null;
+    }
+
     public function selectProduct(ProductInterface $product)
     {
         foreach ($this->stock as $stock) {
@@ -122,6 +171,18 @@ class VendingMachine
                 
                 // Product can be disposed safely
                 if ($product->getPrice() <=$availableFunds) {
+                    // Calculate and see if the change can be disposed
+                    $changeToDispose = bcsub($availableFunds, $product->getPrice());
+
+                    if (bccomp($changeToDispose, 0) == 1) {
+                        $preparedChange = $this->pickChange($changeToDispose);
+                        
+                        // Move change to the tray
+                        foreach ($preparedChange as $coin) {
+                            $this->returnTray->add($coin);
+                        }
+                    }
+
                     // Move the coins from pending tray to the bank
                     foreach ($this->pendingTransactionTray->contents() as $coin) {
                         $this->pendingTransactionTray->remove($coin);
