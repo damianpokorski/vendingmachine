@@ -9,21 +9,25 @@ use VendingMachine\Display\MemoryDisplay;
 use VendingMachine\Tests\BaseVendingMachineFeatureTest;
 use VendingMachine\VendingMachine;
 
-class DisplayInsertCoinWhenNoCoinsInsertedFeature extends BaseVendingMachineFeatureTest
+class DisplayFeature extends BaseVendingMachineFeatureTest
 {
-    public function testDisplayInsertCoinWhenNoCoinsInsertedFeature()
-    {
-        // Defining display through dependency injection allows us to read the contents without
-        // accessing it directly through the vending machine
-        $display = new MemoryDisplay;
-
-        $vendingMachine = new VendingMachine(
-            new MemoryCoinRepository,
-            new MemoryCoinRepository,
-            new MemoryCoinRepository,
-            $display
-        );
-
+    /**
+    * @dataProvider vendingMachineDataProvider
+    * @param VendingMachine $vendingMachine
+    * @param CoinRepositoryInterface $bank
+    * @param CoinRepositoryInterface $pendingTransactionTray
+    * @param CoinRepositoryInterface $returnTray
+    * @param DisplayInterface $display
+    * @param CoinEvaluatorInterface[] $coinEvaluators
+    */
+    public function testDisplayInsertCoinWhenNoCoinsInsertedFeature(
+        $vendingMachine,
+        $bank,
+        $pendingTransactionTray,
+        $returnTray,
+        $display,
+        $coinEvaluators
+    ) {
         $this->assertEquals("INSERT COIN", $display->getContent());
     }
 

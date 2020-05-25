@@ -4,7 +4,21 @@ namespace VendingMachine\Coin\Contracts;
 
 interface CoinEvaluatorInterface
 {
+    /**
+     * Gets the value of the evaluator
+     *
+     * @return float
+     */
+    public function getValue(): float;
+
+    /**
+     * Evaluates whether the provided coin 
+     *
+     * @param CoinInterface $coin
+     * @return boolean
+     */
     public function is(CoinInterface $coin): bool;
+    
     /**
      * Returns the value of a coin or a null if the value is not correct
      *

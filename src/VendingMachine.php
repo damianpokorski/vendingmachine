@@ -77,7 +77,7 @@ class VendingMachine
 
         // If
         if (empty($this->pendingTransactionTray->contents())) {
-            $this->display->setContent("INSERT COIN");
+            $this->displayDefaultMessage();
         }
 
         // Set arbitratry math precition to 3 digits after .
@@ -90,24 +90,24 @@ class VendingMachine
         $this->display->setContent(\money_format('%i', $totalValue));
     }
 
-    /**
-     * Handles the coin insertion logic
-     *
-     * @param CoinInterface $coin
-     * @return void
-     */
-    public function insertCoin(CoinInterface $coin)
+    private function displayDefaultMessage()
     {
-        $coinValue = CoinExtensions::getCoinValue($coin, $this->coinEvaluators);
+        $changeAvailable = true;
 
-        // Coins without value are placed back in return tray
-        if (\is_null($coinValue)) {
-            $this->returnTray->add($coin);
-            return;
+        // If the bank is empty - EXACT CHANGE ONLY
+        if (empty($this->bank->contents())) {
+            $changeAvailable = false;
         }
 
-        $this->pendingTransactionTray->add($coin);
-        $this->displayPendingTransactionTotal();
+        // Check if we have at least a sinle coin of each type that we accept
+        foreach ($this->coinEvaluators as $evaluator) {
+            if ($this->pickChange($evaluator->getValue()) == null) {
+                $changeAvailable = false;
+                break;
+            }
+        }
+
+        $this->display->setContent($changeAvailable ? 'INSERT COIN' : 'EXACT CHANGE ONLY');
     }
 
     public function pickChange($changeToDispose)
@@ -156,6 +156,26 @@ class VendingMachine
         return null;
     }
 
+    /**
+     * Handles the coin insertion logic
+     *
+     * @param CoinInterface $coin
+     * @return void
+     */
+    public function insertCoin(CoinInterface $coin)
+    {
+        $coinValue = CoinExtensions::getCoinValue($coin, $this->coinEvaluators);
+
+        // Coins without value are placed back in return tray
+        if (\is_null($coinValue)) {
+            $this->returnTray->add($coin);
+            return;
+        }
+
+        $this->pendingTransactionTray->add($coin);
+        $this->displayPendingTransactionTotal();
+    }
+
     public function selectProduct(ProductInterface $product)
     {
         foreach ($this->stock as $stock) {
@@ -170,7 +190,7 @@ class VendingMachine
 
                 // No funds available - display price
                 if ($availableFunds < $product->getPrice()) {
-                    $this->display->setContent('INSERT COIN');
+                    $this->displayDefaultMessage();
                     $this->display->setContent('PRICE '.\money_format('%i', $stock->getProduct()->getPrice()), true);
                     return;
                 }
@@ -199,7 +219,7 @@ class VendingMachine
                     $stock->dispose();
 
                     // Update display
-                    $this->display->setContent('INSERT COIN');
+                    $this->displayDefaultMessage();
                     $this->display->setContent('THANK YOU', true);
                     return;
                 }
@@ -213,6 +233,6 @@ class VendingMachine
             $this->pendingTransactionTray->remove($coin);
             $this->returnTray->add($coin);
         }
-        $this->display->setContent('INSERT COIN');
+        $this->displayDefaultMessage();
     }
 }
