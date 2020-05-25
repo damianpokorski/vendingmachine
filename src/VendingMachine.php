@@ -182,8 +182,7 @@ class VendingMachine
             if ($stock->getProduct()->getName() == $product->getName()) {
                 // If there is no stock available - abandon the process after updating temporary message
                 if ($stock->getQuantity() < 1) {
-                    $this->display->setContent('SOLD OUT', true);
-                    return;
+                    break;
                 }
 
                 $availableFunds = CoinRepositoryAggregateExtensions::totalValue($this->pendingTransactionTray, $this->coinEvaluators);
@@ -225,6 +224,7 @@ class VendingMachine
                 }
             }
         }
+        $this->display->setContent('SOLD OUT', true);
     }
 
     public function returnCoins()

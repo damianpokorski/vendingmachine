@@ -11,7 +11,7 @@ use VendingMachine\Tests\BaseVendingMachineFeatureTest;
 use VendingMachine\CoinRepository\CoinRepositoryAggregateExtensions;
 use VendingMachine\CoinRepository\Contracts\CoinRepositoryInterface;
 
-class VendingMachineAcceptCoinFeature extends BaseVendingMachineFeatureTest
+class AcceptCoinFeature extends BaseVendingMachineFeatureTest
 {
     public function testAcceptCoinFeatureExists()
     {

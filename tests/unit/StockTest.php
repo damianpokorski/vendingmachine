@@ -16,7 +16,17 @@ class StockTest extends TestCase
         $this->assertNotNull(new MemoryStock(new Product('Imaginary product', 0.01), 10));
     }
 
-    public function testStockDisposalDecrementsQuantity() {
+    public function testStockCanRetrieveItemDetails()
+    {
+        $stock = new MemoryStock(new Product('Imaginary product', 0.01), 10);
+
+        // Assest stock quantity before disposal
+        $this->assertEquals('Imaginary product', $stock->getProduct()->getName());
+        $this->assertEquals(0.01, $stock->getProduct()->getPrice());
+    }
+
+    public function testStockDisposalDecrementsQuantity()
+    {
         $stock = new MemoryStock(new Product('Imaginary product', 0.01), 10);
 
         // Assest stock quantity before disposal
@@ -25,7 +35,7 @@ class StockTest extends TestCase
         // Dispose
         $stock->dispose();
 
-        // 
+        // Validate quantity dropped
         $this->assertEquals(9, $stock->getQuantity());
     }
 }

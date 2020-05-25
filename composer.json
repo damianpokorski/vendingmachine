@@ -6,7 +6,8 @@
         "phpunit/phpunit": "^9.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.1"
+        "phpunit/phpunit": "^9.1",
+        "codedungeon/phpunit-result-printer": "^0.27.0"
     },
     "license": "MIT",
     "autoload": {
@@ -24,6 +25,7 @@
         }
     ],
     "scripts": {
-        "test": "vendor/bin/phpunit"
+        "test": "vendor/bin/phpunit",
+        "coverage": "vendor/bin/phpunit --coverage-text"
     }
 }
